@@ -1,0 +1,15 @@
+ath_017 12 500 5000
+ath_017.dat 16 50000/mV 16 0 -4626 24543 0 I
+ath_017.dat 16 50000/mV 16 0 -22410 53943 0 II
+ath_017.dat 16 50000/mV 16 0 -23308 59440 0 III
+ath_017.dat 16 50000/mV 16 0 19765 53440 0 AVR
+ath_017.dat 16 50000/mV 16 0 19392 31567 0 AVL
+ath_017.dat 16 50000/mV 16 0 -23464 49871 0 AVF
+ath_017.dat 16 50000/mV 16 0 14230 41898 0 V1
+ath_017.dat 16 50000/mV 16 0 14835 13679 0 V2
+ath_017.dat 16 50000/mV 16 0 1402 16672 0 V3
+ath_017.dat 16 50000/mV 16 0 -8873 36473 0 V4
+ath_017.dat 16 50000/mV 16 0 -15389 13678 0 V5
+ath_017.dat 16 50000/mV 16 0 -19773 21947 0 V6
+#SL12: Sinus rhythm with first degree AV block, Otherwise normal ECG
+#C: Normal sinus rhythm, first degree AV block, Normal ECG

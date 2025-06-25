@@ -1,0 +1,15 @@
+ath_027 12 500 5000
+ath_027.dat 16 50000/mV 16 0 -6397 38419 0 I
+ath_027.dat 16 50000/mV 16 0 -18050 34559 0 II
+ath_027.dat 16 50000/mV 16 0 -6648 53873 0 III
+ath_027.dat 16 50000/mV 16 0 13081 61493 0 AVR
+ath_027.dat 16 50000/mV 16 0 1808 59557 0 AVL
+ath_027.dat 16 50000/mV 16 0 -21180 25206 0 AVF
+ath_027.dat 16 50000/mV 16 0 4073 30152 0 V1
+ath_027.dat 16 50000/mV 16 0 11224 62832 0 V2
+ath_027.dat 16 50000/mV 16 0 9331 6993 0 V3
+ath_027.dat 16 50000/mV 16 0 2944 60597 0 V4
+ath_027.dat 16 50000/mV 16 0 -14855 29044 0 V5
+ath_027.dat 16 50000/mV 16 0 -21169 62392 0 V6
+#SL12: Sinus bradycardia, Nonspecific intraventricular conduction delay, ST elevation, consider early repolarization, pericarditis, or injury, Abnormal ECG
+#C: Sinus bradycardia, Normal ECG

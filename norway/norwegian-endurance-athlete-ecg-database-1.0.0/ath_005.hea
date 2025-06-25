@@ -1,0 +1,15 @@
+ath_005 12 500 5000
+ath_005.dat 16 50000/mV 16 0 -29256 34030 0 I
+ath_005.dat 16 50000/mV 16 0 -24105 40206 0 II
+ath_005.dat 16 50000/mV 16 0 -13153 14126 0 III
+ath_005.dat 16 50000/mV 16 0 27811 16601 0 AVR
+ath_005.dat 16 50000/mV 16 0 -7933 478 0 AVL
+ath_005.dat 16 50000/mV 16 0 -19660 4181 0 AVF
+ath_005.dat 16 50000/mV 16 0 16050 39296 0 V1
+ath_005.dat 16 50000/mV 16 0 15204 14752 0 V2
+ath_005.dat 16 50000/mV 16 0 9119 49562 0 V3
+ath_005.dat 16 50000/mV 16 0 -17804 7201 0 V4
+ath_005.dat 16 50000/mV 16 0 -28537 56480 0 V5
+ath_005.dat 16 50000/mV 16 0 -28737 61279 0 V6
+#SL12: Sinus bradycardia and sinus arrhythmia and first degree AV block, Otherwise normal ECG
+#C: Sinus bradycardia, normal sinus rhythm, First degree AV block, Normal ECG

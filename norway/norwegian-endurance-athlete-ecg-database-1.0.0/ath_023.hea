@@ -1,0 +1,15 @@
+ath_023 12 500 5000
+ath_023.dat 16 50000/mV 16 0 -16819 908 0 I
+ath_023.dat 16 50000/mV 16 0 -27499 11086 0 II
+ath_023.dat 16 50000/mV 16 0 -27685 3681 0 III
+ath_023.dat 16 50000/mV 16 0 26213 18756 0 AVR
+ath_023.dat 16 50000/mV 16 0 10067 9742 0 AVL
+ath_023.dat 16 50000/mV 16 0 -27898 24240 0 AVF
+ath_023.dat 16 50000/mV 16 0 30246 57588 0 V1
+ath_023.dat 16 50000/mV 16 0 17781 54718 0 V2
+ath_023.dat 16 50000/mV 16 0 6137 35197 0 V3
+ath_023.dat 16 50000/mV 16 0 -16078 31503 0 V4
+ath_023.dat 16 50000/mV 16 0 -24226 1751 0 V5
+ath_023.dat 16 50000/mV 16 0 -29371 18538 0 V6
+#SL12: ***Critical test result: STEMI, Sinus bradycardia, Right atrial enlargement, ST elevation consider anterolateral injury or acute infarction, ** ** ACUTE MI/STEMI** **, Abnormal ECG
+#C: Sinus bradycardia, Left ventricular hypertrophy, Normal ECG

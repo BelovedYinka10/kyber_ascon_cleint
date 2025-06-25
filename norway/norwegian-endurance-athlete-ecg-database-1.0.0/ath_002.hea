@@ -1,0 +1,15 @@
+ath_002 12 500 5000
+ath_002.dat 16 50000/mV 16 0 5425 2174 0 I
+ath_002.dat 16 50000/mV 16 0 -25812 57655 0 II
+ath_002.dat 16 50000/mV 16 0 -24090 33636 0 III
+ath_002.dat 16 50000/mV 16 0 18539 38101 0 AVR
+ath_002.dat 16 50000/mV 16 0 19728 18423 0 AVL
+ath_002.dat 16 50000/mV 16 0 -25599 11682 0 AVF
+ath_002.dat 16 50000/mV 16 0 18800 8632 0 V1
+ath_002.dat 16 50000/mV 16 0 13548 52970 0 V2
+ath_002.dat 16 50000/mV 16 0 13032 61356 0 V3
+ath_002.dat 16 50000/mV 16 0 -7806 46392 0 V4
+ath_002.dat 16 50000/mV 16 0 -14043 12027 0 V5
+ath_002.dat 16 50000/mV 16 0 -25768 39531 0 V6
+#SL12: Sinus bradycardia with marked sinus arrhythmia, Right axis deviation, Borderline ECG
+#C: Sinus arrhythmia, Right axis deviation, Normal ECG

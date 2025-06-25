@@ -1,0 +1,15 @@
+ath_025 12 500 5000
+ath_025.dat 16 50000/mV 16 0 2586 47478 0 I
+ath_025.dat 16 50000/mV 16 0 -20284 22726 0 II
+ath_025.dat 16 50000/mV 16 0 -20072 62439 0 III
+ath_025.dat 16 50000/mV 16 0 10536 29236 0 AVR
+ath_025.dat 16 50000/mV 16 0 13245 57051 0 AVL
+ath_025.dat 16 50000/mV 16 0 -26964 12870 0 AVF
+ath_025.dat 16 50000/mV 16 0 24768 23894 0 V1
+ath_025.dat 16 50000/mV 16 0 27697 61392 0 V2
+ath_025.dat 16 50000/mV 16 0 23351 8582 0 V3
+ath_025.dat 16 50000/mV 16 0 18392 9564 0 V4
+ath_025.dat 16 50000/mV 16 0 -13068 27696 0 V5
+ath_025.dat 16 50000/mV 16 0 -19321 41014 0 V6
+#SL12: Sinus bradycardia, Otherwise normal ECG
+#C: Normal sinus rhythm, Left ventricular hypertrophy, Normal ECG

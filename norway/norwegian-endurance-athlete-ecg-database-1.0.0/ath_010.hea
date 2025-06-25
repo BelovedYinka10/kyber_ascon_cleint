@@ -1,0 +1,15 @@
+ath_010 12 500 5000
+ath_010.dat 16 50000/mV 16 0 -14496 64118 0 I
+ath_010.dat 16 50000/mV 16 0 -19921 18058 0 II
+ath_010.dat 16 50000/mV 16 0 -19772 51332 0 III
+ath_010.dat 16 50000/mV 16 0 18406 20425 0 AVR
+ath_010.dat 16 50000/mV 16 0 13715 28470 0 AVL
+ath_010.dat 16 50000/mV 16 0 -20043 58974 0 AVF
+ath_010.dat 16 50000/mV 16 0 17438 39963 0 V1
+ath_010.dat 16 50000/mV 16 0 22478 34237 0 V2
+ath_010.dat 16 50000/mV 16 0 28625 5096 0 V3
+ath_010.dat 16 50000/mV 16 0 30898 48289 0 V4
+ath_010.dat 16 50000/mV 16 0 -14803 29817 0 V5
+ath_010.dat 16 50000/mV 16 0 -22127 62848 0 V6
+#SL12: ***Critical test result: STEMI, Sinus bradycardia, Right atrial enlargement, Anterior infarction age not determined, Lateral injury pattern, ** ** ACUTE MI/STEMI** **, Abnormal EKG
+#C: Normal sinus rhythm, Possible left ventricular hypertrophy, Left atrial enlargement, Misplaced electrodes, Borderline ECG

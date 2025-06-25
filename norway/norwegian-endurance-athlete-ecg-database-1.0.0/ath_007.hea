@@ -1,0 +1,15 @@
+ath_007 12 500 5000
+ath_007.dat 16 50000/mV 16 0 646 573 0 I
+ath_007.dat 16 50000/mV 16 0 -12336 42554 0 II
+ath_007.dat 16 50000/mV 16 0 -19985 18080 0 III
+ath_007.dat 16 50000/mV 16 0 5388 41695 0 AVR
+ath_007.dat 16 50000/mV 16 0 16600 15252 0 AVL
+ath_007.dat 16 50000/mV 16 0 -16970 30646 0 AVF
+ath_007.dat 16 50000/mV 16 0 -4615 41723 0 V1
+ath_007.dat 16 50000/mV 16 0 4541 48298 0 V2
+ath_007.dat 16 50000/mV 16 0 9766 38519 0 V3
+ath_007.dat 16 50000/mV 16 0 8433 2627 0 V4
+ath_007.dat 16 50000/mV 16 0 2931 39261 0 V5
+ath_007.dat 16 50000/mV 16 0 -4844 54017 0 V6
+#SL12: ***Critical test result: STEMI, Normal sinus rhythm, Pulmonary disease pattern, Incomplete right bundle branch block, Possible right ventricular hypertrophy, Cannot rule out inferior infarct age not determined, Anterolateral injury pattern, ** ** ACUTE MI/STEMI** **, Abnormal ECG
+#C: Normal sinus rhythm, Normal ECG

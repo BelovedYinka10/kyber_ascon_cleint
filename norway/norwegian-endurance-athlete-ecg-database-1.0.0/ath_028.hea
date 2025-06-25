@@ -1,0 +1,15 @@
+ath_028 12 500 5000
+ath_028.dat 16 50000/mV 16 0 -3748 7891 0 I
+ath_028.dat 16 50000/mV 16 0 -11443 9953 0 II
+ath_028.dat 16 50000/mV 16 0 -16564 14473 0 III
+ath_028.dat 16 50000/mV 16 0 8655 49019 0 AVR
+ath_028.dat 16 50000/mV 16 0 8807 49282 0 AVL
+ath_028.dat 16 50000/mV 16 0 -14149 60143 0 AVF
+ath_028.dat 16 50000/mV 16 0 22027 6356 0 V1
+ath_028.dat 16 50000/mV 16 0 15445 46774 0 V2
+ath_028.dat 16 50000/mV 16 0 17810 14822 0 V3
+ath_028.dat 16 50000/mV 16 0 -4249 40786 0 V4
+ath_028.dat 16 50000/mV 16 0 -15409 1351 0 V5
+ath_028.dat 16 50000/mV 16 0 -19873 48055 0 V6
+#SL12: ***Critical test result: STEMI, Sinus bradycardia, Nonspecific intraventricular conduction delay, ST elevation consider anterolateral injury or acute infarct, ** ** ACUTE MI/STEMI** **, Abnormal ECG
+#C: Normal sinus rhythm, Normal ECG

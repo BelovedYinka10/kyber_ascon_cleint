@@ -1,0 +1,15 @@
+ath_024 12 500 5000
+ath_024.dat 16 50000/mV 16 0 -2896 30979 0 I
+ath_024.dat 16 50000/mV 16 0 -14519 14692 0 II
+ath_024.dat 16 50000/mV 16 0 -26584 53292 0 III
+ath_024.dat 16 50000/mV 16 0 9780 17878 0 AVR
+ath_024.dat 16 50000/mV 16 0 9708 18988 0 AVL
+ath_024.dat 16 50000/mV 16 0 -19826 55628 0 AVF
+ath_024.dat 16 50000/mV 16 0 6637 45353 0 V1
+ath_024.dat 16 50000/mV 16 0 23742 31404 0 V2
+ath_024.dat 16 50000/mV 16 0 14351 7359 0 V3
+ath_024.dat 16 50000/mV 16 0 -7198 37338 0 V4
+ath_024.dat 16 50000/mV 16 0 -20474 26745 0 V5
+ath_024.dat 16 50000/mV 16 0 -20362 35912 0 V6
+#SL12: Sinus bradycardia, Incomplete right bundle branch block, Minimal voltage criteria for LVH, may be normal variant, ST elevation, probably due to early repolarization, Borderline ECG
+#C: Sinus bradycardia, Incomplete right bundle branch block, Normal ECG
