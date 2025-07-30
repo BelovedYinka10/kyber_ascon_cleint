@@ -10,7 +10,7 @@ from datetime import datetime
 # === 1. ASCON Setup ===
 # In practice use a securely‐generated random key and nonce,
 # here we use fixed values for demonstration:
-key   = b"\x00" * 16               # 128-bit key
+key = b"\x00" * 16  # 128-bit key
 nonce = b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"  # 128-bit nonce
 
 # === 2. Load & serialize ECG sample ===
@@ -32,12 +32,12 @@ b64_ecg = base64.b64encode(ecg_cipher).decode()
 
 # === 4. Build clear-text HL7 ORU^R01 message ===
 msg = Message("ORU_R01", version="2.3")
-msg.msh.msh_3  = "ECG-CLIENT"
-msg.msh.msh_4  = "FPGA-APP"
-msg.msh.msh_5  = "ECG-SERVER"
-msg.msh.msh_6  = "HOSPITAL"
-msg.msh.msh_7  = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-msg.msh.msh_9  = "ORU^R01"
+msg.msh.msh_3 = "ECG-CLIENT"
+msg.msh.msh_4 = "FPGA-APP"
+msg.msh.msh_5 = "ECG-SERVER"
+msg.msh.msh_6 = "HOSPITAL"
+msg.msh.msh_7 = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+msg.msh.msh_9 = "ORU^R01"
 msg.msh.msh_10 = "MSG0001"
 msg.msh.msh_11 = "P"
 msg.msh.msh_12 = "2.3"
@@ -78,7 +78,7 @@ print(b64_full)
 
 # === 6. Decrypt it back ===
 cipher_bytes = base64.b64decode(b64_full)
-plain_bytes  = ascon_decrypt(
+plain_bytes = ascon_decrypt(
     key=key,
     nonce=nonce,
     ciphertext=cipher_bytes,

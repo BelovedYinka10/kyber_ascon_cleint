@@ -5,7 +5,6 @@ import os
 import pandas as pd
 import plotly.graph_objects as go
 import requests
-
 from pyascon.ascon import ascon_encrypt
 from smaj_kyber import encapsulate, set_mode
 
@@ -13,8 +12,7 @@ app = Flask(__name__)
 
 # === Path & Crypto Setup ===
 BASE_ECG_DIR = "/Users/mac/Desktop/secure by design/norway/norwegian-endurance-athlete-ecg-database-1.0.0/"
-BASE_URL = "http://192.168.180.105:5000"
-
+SERVER_URL = os.getenv("SERVER_URL")
 
 set_mode("512")
 
@@ -33,10 +31,13 @@ def ecg_viewer(athlete_id):
         return f"Error loading athlete {athlete_id}: {e}"
 
     sampling_rate = 500
+
     duration_sec = signals.shape[0] / sampling_rate
+
     time_axis = np.arange(0, duration_sec, 1 / sampling_rate)
 
     lead_names = ['V6', 'V5', 'V4', 'V3', 'V2', 'V1', 'aVF', 'aVL', 'aVR', 'III', 'II', 'I']
+
     vertical_offsets = np.arange(len(lead_names)) * 2
     lead_names = lead_names[::-1]
     vertical_offsets = vertical_offsets[::-1]
@@ -86,7 +87,7 @@ def upload_ecg(athlete_id):
     print("AAAA", athlete_id)
     try:
         # === Step 1: Get Server Public Key ===
-        resp = requests.get(f"{BASE_URL}/kyber-public-key", timeout=5)
+        resp = requests.get(f"{SERVER_URL}/kyber-public-key", timeout=5)
         resp.raise_for_status()
         server_pk = resp.content
         print("[INFO] Received Kyber public key from server.")
@@ -129,7 +130,7 @@ def upload_ecg(athlete_id):
     }
 
     try:
-        r = requests.post(f"{BASE_URL}/secure-ecg", json=payload, headers={"Content-Type": "application/json"})
+        r = requests.post(f"{SERVER_URL}/secure-ecg", json=payload, headers={"Content-Type": "application/json"})
         return jsonify({"status": "success", "response": r.text})
     except requests.exceptions.RequestException as e:
         return jsonify({"status": "error", "message": "Upload failed", "error": str(e)}), 500
@@ -137,3 +138,4 @@ def upload_ecg(athlete_id):
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5050)
+
