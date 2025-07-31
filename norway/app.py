@@ -129,6 +129,8 @@ def upload_ecg(athlete_id):
         "id": athlete_id
     }
 
+    print("hi")
+
     try:
         r = requests.post(f"{SERVER_URL}/secure-ecg", json=payload, headers={"Content-Type": "application/json"})
         return jsonify({"status": "success", "response": r.text})
