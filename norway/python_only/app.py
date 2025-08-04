@@ -19,7 +19,7 @@ print("TEMPLATE FOLDER:", os.path.abspath(os.path.join(os.path.dirname(__file__)
 app = Flask(__name__)
 
 # === Path & Crypto Setup ===
-BASE_ECG_DIR = "/Users/mac/Desktop/secure by design/norway/norwegian-endurance-athlete-ecg-database-1.0.0/"
+BASE_ECG_DIR = "../norway/norwegian-endurance-athlete-ecg-database-1.0.0/"
 SERVER_URL = os.getenv("SERVER_URL")
 CLIENT_URL = os.getenv("CLIENT_URL")
 
