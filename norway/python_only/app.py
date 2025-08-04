@@ -40,19 +40,13 @@ def ecg_viewer(athlete_id):
         signals, _ = wfdb.rdsamp(record_path)
     except Exception as e:
         return f"Error loading athlete {athlete_id}: {e}"
-
     sampling_rate = 500
-
     duration_sec = signals.shape[0] / sampling_rate
-
     time_axis = np.arange(0, duration_sec, 1 / sampling_rate)
-
     lead_names = ['V6', 'V5', 'V4', 'V3', 'V2', 'V1', 'aVF', 'aVL', 'aVR', 'III', 'II', 'I']
-
     vertical_offsets = np.arange(len(lead_names)) * 2
     lead_names = lead_names[::-1]
     vertical_offsets = vertical_offsets[::-1]
-
     fig = go.Figure()
     for i in range(12):
         y = (signals[:, i] + vertical_offsets[i]).tolist()
@@ -64,7 +58,6 @@ def ecg_viewer(athlete_id):
             line=dict(color='black', width=1),
             showlegend=False
         ))
-
     # ECG-style grid
     shapes = []
     grid_color = 'rgba(255, 0, 0, 0.5)'
@@ -122,17 +115,15 @@ def upload_ecg(athlete_id):
     }
     df.rename(columns=lambda col: lead_case_fix.get(col, col), inplace=True)
     df.insert(0, "time", np.arange(signals.shape[0]) / fields['fs'])
-
     json_data = df.to_json(orient='records')
-
     # === Step 4: Kyber + Ascon ===
     import tracemalloc
     # --- Kyber encapsulation profiling ---
     tracemalloc.start()
     start_time = time.perf_counter()  # Best for measuring short durations
-    start_cycles = cycles.rdtsc()
+    # start_cycles = cycles.rdtsc()
     shared_secret, ct = ML_KEM_512.encaps(server_pk)
-    end_cycles = cycles.rdtsc()
+    # end_cycles = cycles.rdtsc()
     end_time = time.perf_counter()
     snapshot_kyber = tracemalloc.take_snapshot()
     top_kyber = snapshot_kyber.statistics('lineno')
@@ -145,7 +136,7 @@ def upload_ecg(athlete_id):
     current, peak = tracemalloc.get_traced_memory()
     elapsed_time = end_time - start_time
     print(f"Elapsed time: {elapsed_time:.6f} seconds")
-    print(f"[Cycles] Keypair ENCAPS cycle: {end_cycles - start_cycles} cycles")
+    # print(f"[Cycles] Keypair ENCAPS cycle: {end_cycles - start_cycles} cycles")
     print(f"[Peak Mem] Kyber encaps - Current: {current / 1024:.1f} KB | Peak: {peak / 1024:.1f} KB")
     tracemalloc.stop()
     key = shared_secret[:16]
@@ -154,9 +145,9 @@ def upload_ecg(athlete_id):
     # --- Ascon encryption profiling ---
     tracemalloc.start()
     start_e_time = time.perf_counter()  # Best for measuring short durations
-    start_enc_cycles = cycles.rdtsc()
+    # start_enc_cycles = cycles.rdtsc()
     ciphertext = ascon_encrypt(key=key, nonce=nonce, plaintext=encoded_plaint_text, associateddata=b"")
-    end_enc_cycles = cycles.rdtsc()
+    # end_enc_cycles = cycles.rdtsc()
     end_e_time = time.perf_counter()  # Best for measuring short durations
     snapshot_ascon = tracemalloc.take_snapshot()
     top_ascon = snapshot_ascon.statistics('lineno')
@@ -168,12 +159,10 @@ def upload_ecg(athlete_id):
             print(f"{i}. {stat}")
     current, peak = tracemalloc.get_traced_memory()
     encryption_elapsed_time = end_e_time - start_e_time
-
     print("encoded_plaint_text size:", len(encoded_plaint_text))
     print(f"Elapsed time for ascon encryption: {encryption_elapsed_time:.6f} seconds")
-    print(f"[Cycles] Ascon  encrypt cycle: {end_enc_cycles - start_enc_cycles} cycles")
+    # print(f"[Cycles] Ascon  encrypt cycle: {end_enc_cycles - start_enc_cycles} cycles")
     print(f"[Peak Mem] Ascon encrypt - Current: {current / 1024:.1f} KB | Peak: {peak / 1024:.1f} KB")
-
     tracemalloc.stop()
     enc_filename = f"ecg_{now}_{athlete_id}.enc"
     enc_path = f"../cg/{enc_filename}"  # Make sure this folder exists

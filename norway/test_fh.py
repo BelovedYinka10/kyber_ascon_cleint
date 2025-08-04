@@ -2,7 +2,7 @@ import wfdb
 import pandas as pd
 import numpy as np
 import base64
-from pyascon.ascon import ascon_encrypt, ascon_decrypt
+from norway.python_only.pyascon import ascon_encrypt, ascon_decrypt
 from hl7apy.core import Message, Segment
 from hl7apy.parser import parse_message
 from datetime import datetime

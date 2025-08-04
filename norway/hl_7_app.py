@@ -31,7 +31,6 @@ SERVER_URL = os.getenv("SERVER_URL")
 RECEIVER_URL = f"{SERVER_URL}/receive-hl7"
 
 
-
 def create_hl7_message():
     """Generate an HL7 ADT^A01 message"""
     msg = Message("ADT_A01", version="2.5", validation_level=2)  # Enable validation
@@ -70,13 +69,10 @@ class HL7Sender(Resource):
     def get(self):
         """Send HL7 Message"""
         hl7_msg = create_hl7_message()
-
         print("hl7_msg", hl7_msg)
-
         # Send to receiver
         headers = {"Content-Type": "text/plain"}
         response = requests.post(RECEIVER_URL, data=hl7_msg, headers=headers)
-
         return {
                    "status": "Message sent successfully",
                    "hl7": hl7_msg,
