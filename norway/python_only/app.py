@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_from_directory
 import wfdb
 import numpy as np
 import os
@@ -13,7 +13,7 @@ from kyber_py.ml_kem import ML_KEM_512
 import os
 import base64
 import tracemalloc
-import cycles  # Your custom rdtsc module
+# import cycles  # Your custom rdtsc module
 import time
 
 now = datetime.utcnow().strftime("%Y%m%d%H%M")
@@ -115,6 +115,7 @@ def upload_ecg(athlete_id):
     }
     df.rename(columns=lambda col: lead_case_fix.get(col, col), inplace=True)
     df.insert(0, "time", np.arange(signals.shape[0]) / fields['fs'])
+
     json_data = df.to_json(orient='records')
     # === Step 4: Kyber + Ascon ===
     import tracemalloc
@@ -159,10 +160,12 @@ def upload_ecg(athlete_id):
             print(f"{i}. {stat}")
     current, peak = tracemalloc.get_traced_memory()
     encryption_elapsed_time = end_e_time - start_e_time
+
     print("encoded_plaint_text size:", len(encoded_plaint_text))
     print(f"Elapsed time for ascon encryption: {encryption_elapsed_time:.6f} seconds")
     # print(f"[Cycles] Ascon  encrypt cycle: {end_enc_cycles - start_enc_cycles} cycles")
     print(f"[Peak Mem] Ascon encrypt - Current: {current / 1024:.1f} KB | Peak: {peak / 1024:.1f} KB")
+
     tracemalloc.stop()
     enc_filename = f"ecg_{now}_{athlete_id}.enc"
     enc_path = f"../cg/{enc_filename}"  # Make sure this folder exists
@@ -297,6 +300,13 @@ def send_ecg_ecg(athlete_id):
         exit(1)
 
     return "SENT"
+
+
+# Serve encrypted ECG files from ../cg/ when /cg/ is accessed
+@app.route('/cg/<path:filename>')
+def serve_encrypted_file(filename):
+    directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '../cg'))
+    return send_from_directory(directory, filename)
 
 
 if __name__ == "__main__":
