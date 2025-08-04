@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>12-Lead ECG Viewer</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">12-Lead ECG Viewer (Clinical Layout)</h2>
+
+    <div style="width: 90%; margin: auto;">
+        {{ graph_html | safe }}
+    </div>
+
+    <div style="width: 90%; margin: 20px auto; text-align: center;">
+        <button id="sendBtn" onclick="sendToServer()">Send to Server</button>
+        <a href="/athlete/{{ athlete_id - 1 if athlete_id > 1 else 1 }}">
+            <button>Previous Athlete</button>
+        </a>
+        <a href="/athlete/{{ athlete_id + 1 if athlete_id < 28 else 28 }}">
+            <button>Next Athlete</button>
+        </a>
+    </div>
+
+    <script>
+        function sendToServer() {
+            const btn = document.getElementById('sendBtn');
+            btn.disabled = true;
+            btn.innerText = 'Sending...';
+
+            fetch(`/upload-ecg/{{ athlete_id }}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Upload: ' + data.status);
+            })
+            .catch(err => {
+                alert('Error: ' + err);
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerText = 'Send to Server';
+            });
+        }
+    </script>
+</body>
+</html>
