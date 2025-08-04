@@ -2,18 +2,14 @@ from datetime import datetime
 from flask import Flask, render_template, jsonify, send_from_directory
 import wfdb
 import numpy as np
-import os
 import pandas as pd
 import plotly.graph_objects as go
 import requests
 from pyascon.ascon import ascon_encrypt
-from smaj_kyber import encapsulate, set_mode
 from hl7apy.core import Message
 from kyber_py.ml_kem import ML_KEM_512
 import os
 import base64
-import tracemalloc
-# import cycles  # Your custom rdtsc module
 import time
 
 now = datetime.utcnow().strftime("%Y%m%d%H%M")
