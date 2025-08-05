@@ -110,9 +110,20 @@ def upload_ecg(athlete_id):
         'V4': 'V4', 'V5': 'V5', 'V6': 'V6'
     }
     df.rename(columns=lambda col: lead_case_fix.get(col, col), inplace=True)
+
     df.insert(0, "time", np.arange(signals.shape[0]) / fields['fs'])
 
-    json_data = df.to_json(orient='records')
+    dt_format = os.getenv("DATA_FORMAT")
+
+    data_to_encrypt = None
+
+    if dt_format == "XML":
+        data_to_encrypt = df.to_xml(root_name="ECGData", row_name="Record", index=False)
+    else:
+        data_to_encrypt = df.to_json(orient='records')
+
+    print("data_to_encrypt", data_to_encrypt)
+
     # === Step 4: Kyber + Ascon ===
     import tracemalloc
     # --- Kyber encapsulation profiling ---
@@ -138,7 +149,7 @@ def upload_ecg(athlete_id):
     tracemalloc.stop()
     key = shared_secret[:16]
     nonce = b"12345678abcdef12"
-    encoded_plaint_text = json_data.encode()
+    encoded_plaint_text = data_to_encrypt.encode()
     # --- Ascon encryption profiling ---
     tracemalloc.start()
     start_e_time = time.perf_counter()  # Best for measuring short durations

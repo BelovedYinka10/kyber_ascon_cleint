@@ -17,7 +17,7 @@ MLLP_SB = b"\x0b"  # <VT>
 MLLP_EB = b"\x1c"  # <FS>
 MLLP_CR = b"\x0d"  # <CR>
 
-
+print("HI ME")
 def wrap_mllp(hl7_text: str) -> bytes:
     return MLLP_SB + hl7_text.encode("utf-8") + MLLP_EB + MLLP_CR
 
@@ -66,21 +66,45 @@ def build_qbp_for_pk():
     return msg
 
 
+import base64
+
+
 def extract_pk_from_rsp(rsp_text: str) -> bytes:
-    rsp = parse_message(rsp_text, validation_level=2)
+    """
+    Parse the HL7 ER7 string, find OBX with KYBER_PK in OBX-3, return decoded base64 from OBX-5.
+    Works regardless of grouping/nesting and without hl7apy helpers.
+    """
+    if not rsp_text:
+        raise RuntimeError("Empty RSP text")
 
-    # Recursively find OBX anywhere in the tree
-    obxs = rsp.findall('OBX', max_depth=None)
-    for obx in obxs:
-        obx3 = obx.obx_3.to_er7() if obx.obx_3 else ""
+    # HL7 segments are \r-delimited (sometimes \n on some senders)
+    for line in rsp_text.replace("\n", "\r").split("\r"):
+        if not line:
+            continue
+        # Segments begin with 3-letter code
+        if not line.startswith("OBX|"):
+            continue
+
+        fields = line.split("|")
+        # OBX fields (1-based):
+        # 1: set ID, 2: value type, 3: observation identifier, 5: observation value, 11: status
+        # Ensure we have at least up to OBX-5
+        if len(fields) < 6:
+            continue
+
+        obx3 = fields[3]  # e.g., "KYBER_PK^Kyber Public Key"
         if "KYBER_PK" in obx3:
-            b64_pk = obx.obx_5.to_er7()
-            return base64.b64decode(b64_pk)
+            b64_val = fields[5]
+            if not b64_val:
+                raise RuntimeError("KYBER_PK OBX found but value (OBX-5) is empty")
+            try:
+                return base64.b64decode(b64_val)
+            except Exception as e:
+                raise RuntimeError(f"Failed to base64-decode KYBER_PK from OBX-5: {e}")
 
-    # Debug help if not found
-    print("[DEBUG] No KYBER_PK OBX found. Top-level children:")
-    for elem in rsp.children:
-        print(" -", elem.name)
+    # If we’re here, no suitable OBX was found
+    # Optional: print raw message for quick debugging
+    print("[DEBUG] RSP text (no KYBER_PK OBX found):\n", rsp_text.replace("\r", "\n"))
     raise RuntimeError("No KYBER_PK OBX found in response")
 
 
@@ -167,7 +191,8 @@ def main():
     ap.add_argument("--athlete-id", type=int, default=1, help="Norwegian athlete ID suffix (e.g., 1 → ath_001)")
     ap.add_argument("--dataset-root", required=True, help="Path containing ath_00X records")
     ap.add_argument("--outdir", default="./cg", help="Directory to save encrypted .enc files")
-    ap.add_argument("--client-url", required=True, help="Base URL where server can fetch the saved file (e.g., http://<client-ip>:5050/cg)")
+    ap.add_argument("--client-url", required=True,
+                    help="Base URL where server can fetch the saved file (e.g., http://<client-ip>:5050/cg)")
     args = ap.parse_args()
 
     os.makedirs(args.outdir, exist_ok=True)
@@ -190,8 +215,8 @@ def main():
 
     # === 3) ML-KEM-512 encapsulation + Ascon-128 encryption ===
     shared_key, kyber_ct = ML_KEM_512.encaps(server_pk)
-    ascon_key = shared_key[:16]        # 128-bit
-    nonce = os.urandom(16)             # 128-bit nonce for Ascon-128
+    ascon_key = shared_key[:16]  # 128-bit
+    nonce = os.urandom(16)  # 128-bit nonce for Ascon-128
     ciphertext = ascon_encrypt(key=ascon_key, nonce=nonce, plaintext=ecg_json.encode(), associateddata=b"")
 
     ts = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -216,3 +241,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# python3 client.py   --server-ip 10.85.131.105   --server-port 2575   --athlete-id 1   --dataset-root "/Users/mac/Desktop/secure by design/norway/norwegian-endurance-athlete-ecg-database-1.0.0"   --outdir "./cg"   --client-url "http://10.85.131.213:5050/cg"
