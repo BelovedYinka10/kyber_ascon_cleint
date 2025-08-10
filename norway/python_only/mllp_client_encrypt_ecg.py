@@ -166,12 +166,15 @@ def main():
     args = parser.parse_args()
 
     qbp = build_qbp_for_pk()
-    print("\n[CLIENT] Sending QBP^Q11 for Kyber public key...\n")
+    print(f"\n[CLIENT] Sending QBP^Q11 for Kyber public key {SERVER_IP}...\n")
     rsp_text = mllp_exchange(SERVER_IP, SERVER_PORT, qbp.to_er7())
-    print("[CLIENT] RSP^K11 received.")
+    print(f"[CLIENT] RSP^K11 received {BASE_ECG_DIR}.")
+
     server_pk = extract_pk_from_rsp(rsp_text)
 
     record_path = os.path.join(BASE_ECG_DIR, f"ath_00{args.athlete_id}")
+
+    print("record_path", record_path)
     ecg_data = load_ecg_data(record_path, dt_format)
 
     shared_key, kyber_ct = ML_KEM_512.encaps(server_pk)
@@ -191,7 +194,7 @@ def main():
 
     oru = build_oru_with_ciphertext(ct_b64, nonce_b64, kyber_ct_b64, dt_format)
 
-    print("\n[CLIENT] Sending ORU^R01 with embedded ciphertext...\n")
+    print(f"\n[CLIENT] Sending ORU^R01 with embedded ciphertext {SERVER_IP}...\n")
     ack_text = mllp_exchange(SERVER_IP, SERVER_PORT, oru.to_er7())
     print("[CLIENT] ACK received:\n")
     print(ack_text.replace("\r", "\n"))

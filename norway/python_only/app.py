@@ -114,7 +114,6 @@ def upload_ecg(athlete_id):
 
     df.insert(0, "time", np.arange(signals.shape[0]) / fields['fs'])
 
-
     data_to_encrypt = None
 
     if dt_format == "XML":
@@ -194,8 +193,6 @@ def upload_ecg(athlete_id):
 
 @app.route('/send_ecg/<int:athlete_id>', methods=['POST'])
 def send_ecg_ecg(athlete_id):
-    SERVER_URL = "http://10.27.91.105:5000"
-
     # === Step 1: Download Server Public Key ===
     try:
         resp = requests.get(f"{SERVER_URL}/kyber-public-key", timeout=5)
@@ -205,7 +202,7 @@ def send_ecg_ecg(athlete_id):
         print("[INFO] Received Kyber public key from server.")
 
         # === Step 2: Load ECG Sample ===
-        record = f"/Users/mac/Desktop/secure by design/norway/norwegian-endurance-athlete-ecg-database-1.0.0/ath_00{athlete_id}"
+        record = f"{BASE_ECG_DIR}/ath_00{athlete_id}"
         signals, fields = wfdb.rdsamp(record)
         df = pd.DataFrame(signals, columns=fields['sig_name'])
 
