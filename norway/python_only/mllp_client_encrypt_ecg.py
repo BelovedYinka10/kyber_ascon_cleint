@@ -11,13 +11,23 @@ import pandas as pd
 import wfdb
 from hl7apy.core import Message
 from kyber_py.ml_kem import ML_KEM_512
-from pyascon.ascon import ascon_encrypt  # Ascon-128
+from pyascon.ascon import ascon_encrypt
+from dotenv import load_dotenv
 
-MLLP_SB = b"\x0b"  # <VT>
-MLLP_EB = b"\x1c"  # <FS>
-MLLP_CR = b"\x0d"  # <CR>
+# === Load environment variables ===
+load_dotenv()
 
-TIMEOUT_SECONDS = 180 * 60  # 180 minutes
+BASE_ECG_DIR = os.getenv("BASE_ECG_DIR")
+SERVER_IP = os.getenv("SERVER_IP")
+SERVER_PORT = int(os.getenv("SERVER_PORT", 2575))
+ATHLETE_ID = int(os.getenv("ATHLETE_ID", 1))
+dt_format = os.getenv("DATA_FORMAT", "JSON")
+TIMEOUT_SECONDS = int(os.getenv("TIMEOUT_SECONDS", 180 * 60))
+
+# === MLLP framing constants ===
+MLLP_SB = b"\x0b"
+MLLP_EB = b"\x1c"
+MLLP_CR = b"\x0d"
 
 
 def wrap_mllp(hl7_text: str) -> bytes:
@@ -80,8 +90,7 @@ def extract_pk_from_rsp(rsp_text: str) -> bytes:
         fields = line.split("|")
         if len(fields) < 6:
             continue
-        obx3 = fields[3]
-        if "KYBER_PK" in obx3:
+        if "KYBER_PK" in fields[3]:
             b64_val = fields[5]
             if not b64_val:
                 raise RuntimeError("KYBER_PK OBX found but OBX-5 is empty")
@@ -102,8 +111,7 @@ def load_ecg_data(record_path: str, format: str) -> str:
 
     if format.upper() == "XML":
         return df.to_xml(root_name="ECGData", row_name="Record", index=False)
-    else:
-        return df.to_json(orient="records")
+    return df.to_json(orient="records")
 
 
 def build_oru_with_ciphertext(ct_b64: str, nonce_b64: str, kyber_ct_b64: str, dt_format: str):
@@ -118,10 +126,9 @@ def build_oru_with_ciphertext(ct_b64: str, nonce_b64: str, kyber_ct_b64: str, dt
     msg.msh.msh_11 = "P"
     msg.msh.msh_12 = "2.5"
 
-    msg.add_segment("PID")  # Just required; fake data okay
+    msg.add_segment("PID")
     msg.add_segment("OBR")
 
-    # Format indicator
     obx = msg.add_segment("OBX")
     obx.obx_1 = "0"
     obx.obx_2 = "TX"
@@ -154,25 +161,18 @@ def build_oru_with_ciphertext(ct_b64: str, nonce_b64: str, kyber_ct_b64: str, dt
 
 
 def main():
-    ap = argparse.ArgumentParser(description="HL7 MLLP Client (send ORU with inline ciphertext)")
-    ap.add_argument("--server-ip", required=True)
-    ap.add_argument("--server-port", type=int, default=2575)
-    ap.add_argument("--athlete-id", type=int, default=1)
-    ap.add_argument("--dataset-root", required=True)
-    ap.add_argument("--format", default="JSON", choices=["JSON", "XML"], help="Data format to send (JSON or XML)")
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser(description="HL7 MLLP Client for ECG Transmission")
+    parser.add_argument("--athlete-id", type=int, default=ATHLETE_ID)
+    args = parser.parse_args()
 
     qbp = build_qbp_for_pk()
     print("\n[CLIENT] Sending QBP^Q11 for Kyber public key...\n")
-    rsp_text = mllp_exchange(args.server_ip, args.server_port, qbp.to_er7())
+    rsp_text = mllp_exchange(SERVER_IP, SERVER_PORT, qbp.to_er7())
     print("[CLIENT] RSP^K11 received.")
     server_pk = extract_pk_from_rsp(rsp_text)
 
-    record_path = os.path.join(args.dataset_root, f"ath_00{args.athlete_id}")
-
-    ecg_data = load_ecg_data(record_path, format=args.format)
-
-    print("ecg_data", ecg_data)
+    record_path = os.path.join(BASE_ECG_DIR, f"ath_00{args.athlete_id}")
+    ecg_data = load_ecg_data(record_path, dt_format)
 
     shared_key, kyber_ct = ML_KEM_512.encaps(server_pk)
     ascon_key = shared_key[:16]
@@ -189,10 +189,10 @@ def main():
     nonce_b64 = base64.b64encode(nonce).decode()
     kyber_ct_b64 = base64.b64encode(kyber_ct).decode()
 
-    oru = build_oru_with_ciphertext(ct_b64, nonce_b64, kyber_ct_b64, dt_format=args.format)
+    oru = build_oru_with_ciphertext(ct_b64, nonce_b64, kyber_ct_b64, dt_format)
 
     print("\n[CLIENT] Sending ORU^R01 with embedded ciphertext...\n")
-    ack_text = mllp_exchange(args.server_ip, args.server_port, oru.to_er7())
+    ack_text = mllp_exchange(SERVER_IP, SERVER_PORT, oru.to_er7())
     print("[CLIENT] ACK received:\n")
     print(ack_text.replace("\r", "\n"))
 

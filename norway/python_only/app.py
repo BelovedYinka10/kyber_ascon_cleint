@@ -22,6 +22,7 @@ app = Flask(__name__)
 BASE_ECG_DIR = "../norwegian-endurance-athlete-ecg-database-1.0.0/"
 SERVER_URL = os.getenv("SERVER_URL")
 CLIENT_URL = os.getenv("CLIENT_URL")
+dt_format = os.getenv("DATA_FORMAT")
 
 
 @app.route('/')
@@ -113,7 +114,6 @@ def upload_ecg(athlete_id):
 
     df.insert(0, "time", np.arange(signals.shape[0]) / fields['fs'])
 
-    dt_format = os.getenv("DATA_FORMAT")
 
     data_to_encrypt = None
 
