@@ -121,58 +121,14 @@ def upload_ecg(athlete_id):
     else:
         data_to_encrypt = df.to_json(orient='records')
 
-    print("data_to_encrypt", data_to_encrypt)
-
-    # === Step 4: Kyber + Ascon ===
-    import tracemalloc
-    # --- Kyber encapsulation profiling ---
-    tracemalloc.start()
-    start_time = time.perf_counter()  # Best for measuring short durations
-    # start_cycles = cycles.rdtsc()
     shared_secret, ct = ML_KEM_512.encaps(server_pk)
-    # end_cycles = cycles.rdtsc()
-    end_time = time.perf_counter()
-    snapshot_kyber = tracemalloc.take_snapshot()
-    top_kyber = snapshot_kyber.statistics('lineno')
-    print("\n[Memory] Kyber encapsulation:")
-    if not top_kyber:
-        print("No memory stats captured.")
-    else:
-        for i, stat in enumerate(top_kyber[:5], 1):
-            print(f"{i}. {stat}")
-    current, peak = tracemalloc.get_traced_memory()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed time: {elapsed_time:.6f} seconds")
-    # print(f"[Cycles] Keypair ENCAPS cycle: {end_cycles - start_cycles} cycles")
-    print(f"[Peak Mem] Kyber encaps - Current: {current / 1024:.1f} KB | Peak: {peak / 1024:.1f} KB")
-    tracemalloc.stop()
+
     key = shared_secret[:16]
     nonce = b"12345678abcdef12"
     encoded_plaint_text = data_to_encrypt.encode()
-    # --- Ascon encryption profiling ---
-    tracemalloc.start()
-    start_e_time = time.perf_counter()  # Best for measuring short durations
-    # start_enc_cycles = cycles.rdtsc()
+
     ciphertext = ascon_encrypt(key=key, nonce=nonce, plaintext=encoded_plaint_text, associateddata=b"")
-    # end_enc_cycles = cycles.rdtsc()
-    end_e_time = time.perf_counter()  # Best for measuring short durations
-    snapshot_ascon = tracemalloc.take_snapshot()
-    top_ascon = snapshot_ascon.statistics('lineno')
-    print("\n[Memory] Ascon encryption:")
-    if not top_ascon:
-        print("No memory stats captured.")
-    else:
-        for i, stat in enumerate(top_ascon[:5], 1):
-            print(f"{i}. {stat}")
-    current, peak = tracemalloc.get_traced_memory()
-    encryption_elapsed_time = end_e_time - start_e_time
 
-    print("encoded_plaint_text size:", len(encoded_plaint_text))
-    print(f"Elapsed time for ascon encryption: {encryption_elapsed_time:.6f} seconds")
-    # print(f"[Cycles] Ascon  encrypt cycle: {end_enc_cycles - start_enc_cycles} cycles")
-    print(f"[Peak Mem] Ascon encrypt - Current: {current / 1024:.1f} KB | Peak: {peak / 1024:.1f} KB")
-
-    tracemalloc.stop()
     enc_filename = f"ecg_{now}_{athlete_id}.enc"
     enc_path = f"../cg/{enc_filename}"  # Make sure this folder exists
     with open(enc_path, "wb") as f:
