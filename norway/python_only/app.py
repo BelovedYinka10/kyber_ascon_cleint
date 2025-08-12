@@ -1,16 +1,14 @@
 from datetime import datetime
-from flask import Flask, render_template, jsonify, send_from_directory
+from flask import Flask, render_template, jsonify
 import wfdb
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import requests
 from pyascon.ascon import ascon_encrypt
-from hl7apy.core import Message
 from kyber_py.ml_kem import ML_KEM_512
 import os
 import base64
-import time
 
 now = datetime.utcnow().strftime("%Y%m%d%H%M")
 
@@ -90,6 +88,22 @@ def upload_ecg(athlete_id):
         resp = requests.get(f"{SERVER_URL}/kyber-public-key", timeout=5)
         resp.raise_for_status()
         server_pk = resp.content
+
+        # --- NEW CODE TO SAVE THE PUBLIC KEY ---
+        keys_dir = "keys"
+        os.makedirs(keys_dir, exist_ok=True)
+        # Changed the file extension from .pem to .bin
+        key_filepath = os.path.join(keys_dir, "server_public_key.bin")
+
+        try:
+            with open(key_filepath, "wb") as f:
+                f.write(server_pk)
+            print(f"Successfully saved server public key to {key_filepath}")
+        except Exception as e:
+            # Handle potential file writing errors gracefully
+            return jsonify({"status": "error", "message": "Failed to save public key to disk", "error": str(e)}), 500
+        # --- END OF NEW CODE ---
+
     except Exception as e:
         return jsonify({"status": "error", "message": "Kyber key fetch failed", "error": str(e)}), 500
 
@@ -121,12 +135,14 @@ def upload_ecg(athlete_id):
     else:
         data_to_encrypt = df.to_json(orient='records')
 
+    # Assuming ML_KEM_512 is available and has an encaps method
     shared_secret, ct = ML_KEM_512.encaps(server_pk)
 
     key = shared_secret[:16]
     nonce = b"12345678abcdef12"
     encoded_plaint_text = data_to_encrypt.encode()
 
+    # Assuming ascon_encrypt is available
     ciphertext = ascon_encrypt(key=key, nonce=nonce, plaintext=encoded_plaint_text, associateddata=b"")
 
     enc_filename = f"ecg_{now}_{athlete_id}.enc"
@@ -145,128 +161,6 @@ def upload_ecg(athlete_id):
         return jsonify({"status": "success", "response": r.text})
     except requests.exceptions.RequestException as e:
         return jsonify({"status": "error", "message": "Upload failed", "error": str(e)}), 500
-
-
-@app.route('/send_ecg/<int:athlete_id>', methods=['POST'])
-def send_ecg_ecg(athlete_id):
-    # === Step 1: Download Server Public Key ===
-    try:
-        resp = requests.get(f"{SERVER_URL}/kyber-public-key", timeout=5)
-        resp.raise_for_status()
-        server_pk = resp.content
-
-        print("[INFO] Received Kyber public key from server.")
-
-        # === Step 2: Load ECG Sample ===
-        record = f"{BASE_ECG_DIR}/ath_00{athlete_id}"
-        signals, fields = wfdb.rdsamp(record)
-        df = pd.DataFrame(signals, columns=fields['sig_name'])
-
-        # Fix casing
-        lead_case_fix = {
-            'AVR': 'aVR', 'AVL': 'aVL', 'AVF': 'aVF',
-            'I': 'I', 'II': 'II', 'III': 'III',
-            'V1': 'V1', 'V2': 'V2', 'V3': 'V3',
-            'V4': 'V4', 'V5': 'V5', 'V6': 'V6'
-        }
-        df.rename(columns=lambda col: lead_case_fix.get(col, col), inplace=True)
-        df.insert(0, "time", np.arange(signals.shape[0]) / fields['fs'])
-
-        json_data = df.to_json(orient='records')
-
-        # === Step 3: Kyber Encapsulation + Ascon Encryption ===
-        ct, shared_secret = encapsulate(server_pk)
-
-        key = shared_secret[:16]
-        nonce = b"12345678abcdef12"
-        ciphertext = ascon_encrypt(key=key, nonce=nonce, plaintext=json_data.encode(), associateddata=b"")
-
-        enc_filename = f"ecg_{now}.enc"
-        enc_path = f"./cg/{enc_filename}"  # Make sure this folder exists
-
-        with open(enc_path, "wb") as f:
-            f.write(ciphertext)
-
-        # URL to be sent in payload
-
-        url_encrypted = f"{CLIENT_URL}/ecg/{enc_filename}"
-
-        # hl7 = (
-        #     f"MSH|^~\\&|CLIENT_APP|REMOTE_SITE|HOSPITAL|SERVER|{now}||ORU^R01|MSG123|P|2.5\r"
-        #     f"PID|1||555555^^^HOSPITAL^MR||DOE^JANE||19900101|F\r"
-        #     f"OBR|1||ORDER123||ECG^Encrypted ECG Transmission|||{now}||||||||9999^DOCTOR^SERVER\r"
-        #     f"OBX|1|TX|ECG_LINK^ECG File URL||{url_encrypted}||||||F\r"
-        #     f"OBX|2|TX|NONCE^Encryption Nonce||{nonce.hex()}||||||F\r"
-        #     f"OBX|3|TX|KYBER_CT^Kyber Ciphertext||{ct.hex()}||||||F\r"
-        # )
-
-        # Create ORU^R01 message
-        msg = Message("ORU_R01", version="2.5", validation_level=2)
-
-        # MSH Segment
-        msg.msh.msh_3 = "SendingApp"
-        msg.msh.msh_4 = "SendingFac"
-        msg.msh.msh_5 = "ReceivingApp"
-        msg.msh.msh_6 = "ReceivingFac"
-        msg.msh.msh_7 = datetime.now().strftime('%Y%m%d%H%M%S')
-        msg.msh.msh_9 = "ORU^R01"
-        msg.msh.msh_10 = "123456"  # Message Control ID
-        msg.msh.msh_11 = "P"
-        msg.msh.msh_12 = "2.5"
-
-        # PID Segment
-        pid = msg.add_segment("PID")
-        pid.pid_3 = "123456"
-        pid.pid_5 = "Doe^John"
-        pid.pid_7 = "19800101"
-        pid.pid_8 = "M"
-
-        # OBR Segment (Observation Request)
-        obr = msg.add_segment("OBR")
-        obr.obr_1 = "1"
-        obr.obr_2 = "ECG123"  # Placer Order Number
-        obr.obr_4 = "ECG^Electrocardiogram"
-        obr.obr_7 = datetime.now().strftime('%Y%m%d%H%M%S')  # Observation datetime
-
-        # OBX Segment (Observation Result)
-        obx = msg.add_segment("OBX")
-        obx.obx_1 = "1"
-        obx.obx_2 = "TX"  # Text data
-        obx.obx_3 = "ECGRESULT^ECG Report"
-        obx.obx_5 = "Normal sinus rhythm with no abnormalities"
-        obx.obx_11 = "F"  # Result status: Final
-
-        obx = msg.add_segment("OBX")
-        obx.obx_1 = "2"
-        obx.obx_2 = "RP"  # Reference Pointer
-        obx.obx_3 = "ECGLINK^Encrypted ECG Link"
-        obx.obx_5 = url_encrypted
-        obx.obx_11 = "F"
-
-        print(msg.to_er7().replace("\r", "\n"))
-
-        headers = {
-            "Content-Type": "application/json"
-        }
-
-        try:
-            r = requests.post(f"{SERVER_URL}/hl_secure-ecg", data=msg.to_er7(), headers=headers)
-            print("Status Code:", r.status_code)
-            print("Server response:", r.text)
-        except requests.exceptions.RequestException as e:
-            print("[CLIENT ERROR]", e)
-    except Exception as e:
-        print("[ERROR] Failed to fetch Kyber public key:", e)
-        exit(1)
-
-    return "SENT"
-
-
-# Serve encrypted ECG files from ../cg/ when /cg/ is accessed
-@app.route('/cg/<path:filename>')
-def serve_encrypted_file(filename):
-    directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '../cg'))
-    return send_from_directory(directory, filename)
 
 
 if __name__ == "__main__":
