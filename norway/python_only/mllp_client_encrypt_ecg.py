@@ -16,8 +16,8 @@ from dotenv import load_dotenv
 
 # === Load environment variables ===
 load_dotenv()
-
-BASE_ECG_DIR = os.getenv("BASE_ECG_DIR")
+# BASE_ECG_DIR = os.getenv("BASE_ECG_DIR")
+BASE_ECG_DIR = "../norwegian-endurance-athlete-ecg-database-1.0.0/"
 SERVER_IP = os.getenv("SERVER_IP")
 SERVER_PORT = int(os.getenv("SERVER_PORT", 2575))
 ATHLETE_ID = int(os.getenv("ATHLETE_ID", 1))
