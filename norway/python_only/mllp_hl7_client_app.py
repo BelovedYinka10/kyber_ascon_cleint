@@ -57,6 +57,7 @@ def read_mllp(sock: socket.socket, timeout: float) -> str:
 
 def mllp_exchange(host: str, port: int, hl7_text: str) -> str:
     framed = wrap_mllp(hl7_text)
+    print(f"HOST:{host} PORT :{port}")
     with socket.create_connection((host, port), timeout=TIMEOUT_SECONDS) as sock:
         sock.settimeout(TIMEOUT_SECONDS)
         sock.sendall(framed)
