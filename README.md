@@ -1,15 +1,20 @@
-Thank you — here's a properly structured `README.md` file describing exactly what your script does, in plain terms and with clarity for any collaborator or future reader.
+Thank you — here's a properly structured `README.md` file describing exactly what your script does, in plain terms and
+with clarity for any collaborator or future reader.
 
 ---
 
-### 📄 `README.md`
+###   
+
+📄 `README.md`
 
 ```markdown
 # 🩺 Secure ECG Transmission using Kyber and Ascon
 
-This project demonstrates how to securely transmit ECG data using post-quantum and lightweight cryptography, structured in an HL7 medical message format.
+This project demonstrates how to securely transmit ECG data using post-quantum and lightweight cryptography, structured
+in an HL7 medical message format.
 
 It uses:
+
 - **Kyber512** for post-quantum secure key encapsulation
 - **Ascon-128** for authenticated encryption of ECG data
 - **HL7** to format the encrypted message for clinical systems
@@ -19,7 +24,44 @@ It uses:
 ## 🚀 Workflow Overview
 
 ### ✅ 1. Kyber Key Exchange
+
 The script initiates a **secure session** by retrieving the **Kyber public key** from the server endpoint:
+
+```
+
+How to run this code
+
+```markdown
+# 🩺 Secure ECG Transmission using Kyber and Ascon from the client
+
+1) git clone repo
+
+
+2) cd kyber_ascon_client
+
+3) git checkout arms
+
+4) python -m venv venv
+
+5) activate the virtualenv
+
+6) pip install -r requirements
+
+7) cd norway
+
+8) Edit the .env file with server Ip
+
+9) cd python_only
+
+## for http protocol
+
+10) python app.py
+
+## for mllp protocol
+
+11) python mllp_hl7_client_app.py
+
+--
 
 ```
 
@@ -63,7 +105,6 @@ The ciphertext is saved to:
 /Desktop/secure by design/norway/cg/ecg\_<timestamp>.enc
 
 ```
-
 ---
 
 ### ✅ 4. HL7 Message Construction
@@ -138,7 +179,8 @@ Server response: ECG message successfully received and processed.
 
 ## 📌 Notes
 
-* This is a prototype for secure transmission of clinical waveform data using hybrid post-quantum and lightweight cryptography.
+* This is a prototype for secure transmission of clinical waveform data using hybrid post-quantum and lightweight
+  cryptography.
 * Designed for Medical Internet of Things (MIoT) and edge-device testing.
 
 ```
