@@ -3,7 +3,7 @@ with clarity for any collaborator or future reader.
 
 ---
 
-###   
+###    
 
 📄 `README.md`
 
@@ -51,7 +51,7 @@ How to run this code
 
 8) Edit the .env file with server Ip
 
-9) cd python_only
+9) cd code_folder
 
 ## for http protocol
 
